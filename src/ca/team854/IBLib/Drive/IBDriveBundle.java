@@ -27,6 +27,8 @@ public class IBDriveBundle {
 	final private int motorChannel;
 	final private SpeedController motor;
 	final private String motorClassName;
+	final private double smallestAllowedChange;
+	private double previousSpeed;
 	
 	final private int encoderAModule;
 	final private int encoderAChannel;
@@ -36,7 +38,7 @@ public class IBDriveBundle {
 	
 	final private PIDController pidController;	
 	
-	IBDriveBundle (int motorModule, int motorChannel, SpeedController s, String name,
+	IBDriveBundle (int motorModule, int motorChannel, SpeedController s, String name, double smallestAllowedChange,
 				  int encoderAModule, int encoderAChannel,
 				  int encoderBModule, int encoderBChannel, Encoder e,
 				  PIDController p) {
@@ -44,7 +46,10 @@ public class IBDriveBundle {
 		this.motorChannel = motorChannel;
 		this.motor = s;
 		this.motorClassName = name;
-				
+		this.smallestAllowedChange = smallestAllowedChange;
+		previousSpeed = 0;
+		set(0);
+		
 		this.encoderAModule  = encoderAModule;
 		this.encoderAChannel = encoderAChannel;
 		this.encoderBModule  = encoderBModule;
@@ -54,26 +59,27 @@ public class IBDriveBundle {
 		this.pidController = p; 
 	}
 	
-	public int getMotorModule() 			{ return motorModule;		}
-	public int getMotorChannel()			{ return motorChannel;		}
-	public SpeedController getMotor()		{ return motor;				}
-	public String getMotorClassName()		{ return motorClassName;	}
+	public int getMotorModule() 		{ return motorModule;		}
+	public int getMotorChannel()		{ return motorChannel;		}
+	public SpeedController getMotor()	{ return motor;			}
+	public String getMotorClassName()	{ return motorClassName;	}
 	
-	public int getEncoderAModule()			{ return encoderAModule;	}
-	public int getEncoderAChannel() 		{ return encoderAChannel;	}
-	public int getEncoderBModule() 			{ return encoderBModule;	}
-	public int getEncoderBChannel() 		{ return encoderBChannel;	}
-	public Encoder getEncoder() 			{ return encoder;			}
+	public int getEncoderAModule()		{ return encoderAModule;	}
+	public int getEncoderAChannel() 	{ return encoderAChannel;	}
+	public int getEncoderBModule() 		{ return encoderBModule;	}
+	public int getEncoderBChannel() 	{ return encoderBChannel;	}
+	public Encoder getEncoder() 		{ return encoder;		}
 	
 	public PIDController getPidController() { return pidController;		}
 	
 	public void set(double speed) {
+		if (Math.abs(speed - previousSpeed) <= smallestAllowedChange) return; //change in speed to small, ignore it
 		if (getPidController() != null) { //if the bundle is PID controlled
 			getPidController().setSetpoint(speed); //set the setpoint on PID
 		}
-		else {
-			getMotor().set(speed); //otherwise set motor speed directly
-		}
+		else getMotor().set(speed); //otherwise set motor speed directly
+		
+		previousSpeed = speed;
 	}
 	
 	public String toString() {
@@ -105,6 +111,7 @@ public class IBDriveBundle {
 		private int motorChannel;
 		private SpeedController motor;
 		private String motorsClassName;
+		private double smallestAllowedChange;
 
 		private int encoderAModule;
 		private int encoderAChannel;
@@ -130,10 +137,15 @@ public class IBDriveBundle {
 		}
 		
 		public IBDriveBundleFactory addMotor(int motorModule, int motorChannel, SpeedController motor) {
+			return addMotor(motorModule, motorChannel, motor, 0.05);
+		}
+		
+		public IBDriveBundleFactory addMotor(int motorModule, int motorChannel, SpeedController motor, double smallestAllowedChange) {
 			this.motorModule = motorModule;
 			this.motorChannel = motorChannel;
 			this.motor = motor;
 			this.motorsClassName = getClassName(motor);
+			this.smallestAllowedChange = smallestAllowedChange;
 					
 			return this;
 		}
@@ -193,7 +205,7 @@ public class IBDriveBundle {
 		}
 		
 		public IBDriveBundle commit() {
-			return new IBDriveBundle(motorModule, motorChannel, motor, motorsClassName,
+			return new IBDriveBundle(motorModule, motorChannel, motor, motorsClassName, smallestAllowedChange,
 									encoderAModule, encoderAChannel,
 									encoderBModule, encoderBChannel,
 									encoder, pidController);

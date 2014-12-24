@@ -3,6 +3,7 @@ package ca.team854.IBLib.Drive;
 import ca.team854.IBLib.Drive.IBDriveBundle.IBDriveBundleFactory;
 import ca.team854.IBLib.Utils;
 import edu.wpi.first.wpilibj.RobotDrive;
+import java.io.UnsupportedEncodingException;
 
 /**
  *
@@ -148,11 +149,11 @@ public class IBRobotDrive extends RobotDrive {
 		if (m_safetyHelper != null) m_safetyHelper.feed();
     }
 	
-//	public void mecanumDrive_Cartesian(double x, double y, double rotation, double gyroAngle) {
-/**@TODO*/
-//	}
+	public void mecanumDrive_Cartesian(double x, double y, double rotation, double gyroAngle) {
+		throw new RuntimeException("NOT IMPLEMENTED YET");
+	}
 
-//	public void mecanumDrive_Polar(double magnitude, double direction, double rotation) {
-/**@TODO*/
-//	}
+	public void mecanumDrive_Polar(double magnitude, double direction, double rotation) {
+		throw new RuntimeException("NOT IMPLEMENTED YET");
+	}
 }
