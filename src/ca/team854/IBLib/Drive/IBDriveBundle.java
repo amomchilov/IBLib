@@ -8,41 +8,30 @@ package ca.team854.IBLib.Drive;
 import ca.team854.IBLib.Utils;
 import edu.wpi.first.wpilibj.CounterBase;
 import edu.wpi.first.wpilibj.Encoder;
-import edu.wpi.first.wpilibj.Jaguar;
 import edu.wpi.first.wpilibj.PIDController;
-import edu.wpi.first.wpilibj.SensorBase;
 import edu.wpi.first.wpilibj.SpeedController;
-import edu.wpi.first.wpilibj.Talon;
-import edu.wpi.first.wpilibj.Victor;
 
 /**
  *
  * @author Alexander
  */
 public class IBDriveBundle {
-
-	static int defaultModule =  SensorBase.getDefaultDigitalModule();
 		
-	final private int motorModule;
 	final private int motorChannel;
 	final private SpeedController motor;
 	final private String motorClassName;
 	final private double smallestAllowedChange;
 	private double previousSpeed;
 	
-	final private int encoderAModule;
 	final private int encoderAChannel;
-	final private int encoderBModule;
 	final private int encoderBChannel;
 	final private Encoder encoder;
 	
 	final private PIDController pidController;	
 	
-	IBDriveBundle (int motorModule, int motorChannel, SpeedController s, String name, double smallestAllowedChange,
-				  int encoderAModule, int encoderAChannel,
-				  int encoderBModule, int encoderBChannel, Encoder e,
+	IBDriveBundle (int motorChannel, SpeedController s, String name, double smallestAllowedChange,
+				  int encoderAChannel, int encoderBChannel, Encoder e,
 				  PIDController p) {
-		this.motorModule  = motorModule;
 		this.motorChannel = motorChannel;
 		this.motor = s;
 		this.motorClassName = name;
@@ -50,23 +39,18 @@ public class IBDriveBundle {
 		previousSpeed = 0;
 		set(0);
 		
-		this.encoderAModule  = encoderAModule;
 		this.encoderAChannel = encoderAChannel;
-		this.encoderBModule  = encoderBModule;
 		this.encoderBChannel = encoderBChannel;
 		this.encoder = e;
 		
 		this.pidController = p; 
 	}
 	
-	public int getMotorModule() 		{ return motorModule;		}
 	public int getMotorChannel()		{ return motorChannel;		}
 	public SpeedController getMotor()	{ return motor;			}
 	public String getMotorClassName()	{ return motorClassName;	}
 	
-	public int getEncoderAModule()		{ return encoderAModule;	}
 	public int getEncoderAChannel() 	{ return encoderAChannel;	}
-	public int getEncoderBModule() 		{ return encoderBModule;	}
 	public int getEncoderBChannel() 	{ return encoderBChannel;	}
 	public Encoder getEncoder() 		{ return encoder;		}
 	
@@ -89,12 +73,9 @@ public class IBDriveBundle {
 	public String toString(int indentLevel) {
 		String s = Utils.indent(indentLevel)+"[IBDriveBundle:";
 		
-		if (motor != null) s += "\n" + Utils.pwmOutToString(indentLevel + 1, motorClassName,
-					getMotorModule(), getMotorChannel());
+		if (motor != null) s += "\n" + Utils.pwmOutToString(indentLevel + 1, motorClassName, getMotorChannel());
 			
-		if (encoder != null) s += "\n" + Utils.encoderToString(indentLevel + 1,
-					getEncoderAModule(), getEncoderAChannel(),
-					getEncoderBModule(), getEncoderBChannel());
+		if (encoder != null) s += "\n" + Utils.encoderToString(indentLevel + 1, getEncoderAChannel(), getEncoderBChannel());
 				
 		if (pidController != null) s+= "\n" + Utils.PIDToString(indentLevel + 1,
 				pidController.getP(),
@@ -107,41 +88,41 @@ public class IBDriveBundle {
 	
 	public static class IBDriveBundleFactory {	
 		
-		private int motorModule;
 		private int motorChannel;
 		private SpeedController motor;
 		private String motorsClassName;
 		private double smallestAllowedChange;
 
-		private int encoderAModule;
 		private int encoderAChannel;
-		private int encoderBModule;
 		private int encoderBChannel;
 		private Encoder encoder;
 	
 		private PIDController pidController;
 		
-		public IBDriveBundleFactory addMotor(int motorChannel, Class c) {
-			return addMotor(defaultModule, motorChannel, c);
-		}
-		
-		public IBDriveBundleFactory addMotor(int motorModule, int motorChannel, Class c) {
+		public IBDriveBundleFactory addMotor(int motorChannel, Class<? extends SpeedController> c) {
+			try {
+				SpeedController m = c.getConstructor(Integer.class).newInstance(motorChannel);
+				return addMotor(motorChannel, m);
+			} catch (Exception e) {
+				// TODO Auto-generated catch block
+				e.printStackTrace();
+			}
 			
-			SpeedController m;
-			if (c.equals(Talon.class))		 m = new  Talon(motorModule,  motorChannel);
-			else if (c.equals(Victor.class)) m = new Victor(motorModule, motorChannel);
-			else if (c.equals(Jaguar.class)) m = new Jaguar(motorModule, motorChannel);
-			else throw new IllegalArgumentException("Class must be a Talon, Victor or Jaguar.");
+			return this;
 			
-			return addMotor(motorModule, motorChannel, m);
+			
+//			if (c.equals(Talon.class))		 m = new  Talon(motorChannel);
+//			else if (c.equals(Victor.class)) m = new Victor(motorChannel);
+//			else if (c.equals(Jaguar.class)) m = new Jaguar(motorChannel);
+//			else throw new IllegalArgumentException("Class must be a Talon, Victor or Jaguar.");
+			
 		}
 		
-		public IBDriveBundleFactory addMotor(int motorModule, int motorChannel, SpeedController motor) {
-			return addMotor(motorModule, motorChannel, motor, 0.05);
+		public IBDriveBundleFactory addMotor(int motorChannel, SpeedController motor) {
+			return addMotor(motorChannel, motor, 0.05);
 		}
 		
-		public IBDriveBundleFactory addMotor(int motorModule, int motorChannel, SpeedController motor, double smallestAllowedChange) {
-			this.motorModule = motorModule;
+		public IBDriveBundleFactory addMotor(int motorChannel, SpeedController motor, double smallestAllowedChange) {
 			this.motorChannel = motorChannel;
 			this.motor = motor;
 			this.motorsClassName = getClassName(motor);
@@ -156,31 +137,21 @@ public class IBDriveBundle {
 		}
 		
 		public IBDriveBundleFactory addEncoder(int encoderAChannel, int encoderBChannel) {
-			return addEncoder(encoderAChannel, encoderBChannel, CounterBase.EncodingType.k1X);
+			return addEncoder(encoderAChannel, encoderBChannel, false, CounterBase.EncodingType.k1X);
 		}
 		
-		public IBDriveBundleFactory addEncoder(int encoderAChannel, int encoderBChannel, CounterBase.EncodingType encodingType) {
-			return addEncoder(defaultModule, encoderAChannel, defaultModule, encoderBChannel, false, encodingType);
-		}
-		
-		public IBDriveBundleFactory addEncoder(int encoderAModule, int encoderAChannel,
-											  int encoderBModule, int encoderBChannel,
+		public IBDriveBundleFactory addEncoder(int encoderAChannel, int encoderBChannel,
 											  boolean reverseDirection,
 											  CounterBase.EncodingType encodingType) {
-			Encoder e =  new Encoder(encoderAModule, encoderAChannel,
-									 encoderBModule, encoderBChannel,
+			Encoder e =  new Encoder(encoderAChannel, encoderBChannel,
 									 reverseDirection, encodingType);
 			
-			return addEncoder (encoderAModule, encoderAChannel,
-							   encoderBModule, encoderBChannel, e);
+			return addEncoder(encoderAChannel, encoderBChannel, e);
 		}
 		
-		public IBDriveBundleFactory addEncoder(int encoderAModule, int encoderAChannel,
-											  int encoderBModule, int encoderBChannel,
+		public IBDriveBundleFactory addEncoder(int encoderAChannel, int encoderBChannel,
 											  Encoder encoder) {
-			this.encoderAModule  = encoderAModule;
 			this.encoderAChannel = encoderAChannel;
-			this.encoderBModule  = encoderBModule;
 			this.encoderBChannel = encoderBChannel;
 			this.encoder = encoder;
 			return this;
@@ -205,13 +176,12 @@ public class IBDriveBundle {
 		}
 		
 		public IBDriveBundle commit() {
-			return new IBDriveBundle(motorModule, motorChannel, motor, motorsClassName, smallestAllowedChange,
-									encoderAModule, encoderAChannel,
-									encoderBModule, encoderBChannel,
+			return new IBDriveBundle(motorChannel, motor, motorsClassName, smallestAllowedChange,
+									encoderAChannel, encoderBChannel,
 									encoder, pidController);
 		}
 		
-		public static IBDriveBundle newBasicBundle(int channel, Class c) {
+		public static IBDriveBundle newBasicBundle(int channel, Class<? extends SpeedController> c) {
 			return new IBDriveBundleFactory()
 					.addMotor(channel, c)
 					.commit();

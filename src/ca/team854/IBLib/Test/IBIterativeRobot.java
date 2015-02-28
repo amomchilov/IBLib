@@ -6,10 +6,10 @@
 /*----------------------------------------------------------------------------*/
 package ca.team854.IBLib.Test;
 
+//import ca.team854.IBLib.IBDriverStationLCD;
 import ca.team854.IBLib.Drive.IBDriveBundle;
 import ca.team854.IBLib.Drive.IBDriveBundle.IBDriveBundleFactory;
 import ca.team854.IBLib.Drive.IBRobotDrive;
-import ca.team854.IBLib.IBDriverStationLCD;
 import ca.team854.IBLib.InputSources.IBPS3Controller;
 import edu.wpi.first.wpilibj.Encoder;
 import edu.wpi.first.wpilibj.IterativeRobot;
@@ -28,7 +28,7 @@ import edu.wpi.first.wpilibj.smartdashboard.SmartDashboard;
 public class IBIterativeRobot extends IterativeRobot {
 
 	IBPS3Controller input;
-	IBDriverStationLCD lcd;
+//	IBDriverStationLCD lcd;
 	IBRobotDrive drive;
 	Talon rightTalons;
 	Encoder leftEncoder, rightEncoder;
@@ -39,7 +39,7 @@ public class IBIterativeRobot extends IterativeRobot {
 	public void robotInit() {
 		System.out.println("robotInit()");
 		input = new IBPS3Controller();
-		lcd  = new IBDriverStationLCD(13, 14);
+//		lcd  = new IBDriverStationLCD(13, 14);
 //		drive = IBRobotDrive.newBasicInstance(Victor.class, PORTS.LEFT_MOTORS, PORTS.RIGHT_MOTORS);
 		
 		IBDriveBundle leftBundle = new IBDriveBundleFactory()
@@ -83,7 +83,7 @@ public class IBIterativeRobot extends IterativeRobot {
 
 	public void disabledInit() {
 		System.out.println("disabledInit()");
-		lcd.clear();
+//		lcd.clear();
 	}
 	
 	public void disabledPeriodic() {}
@@ -119,12 +119,12 @@ public class IBIterativeRobot extends IterativeRobot {
 //					"D-Pad X axis: "+input.getRawAxis(5),
 //					"D-Pad Y axis: "+-input.getRawAxis(6));
 			
-			lcd.display("L  Y axis: " + inputY,
-					"R X axis: " + inputX, 
-					"L Output: " + leftMotorSpeed,
-					"R Output: " + rightMotorSpeed,
-					"L Encoder: " + leftEncoderFeedback,
-					"R Encoder " + rightEncoderFeedback);
+//			lcd.display("L  Y axis: " + inputY,
+//					"R X axis: " + inputX, 
+//					"L Output: " + leftMotorSpeed,
+//					"R Output: " + rightMotorSpeed,
+//					"L Encoder: " + leftEncoderFeedback,
+//					"R Encoder " + rightEncoderFeedback);
 //			lcd.display("Left  Y axis: "+inputSpeed,
 //					"R setpoint: "+rightPID.getSetpoint(),
 //					"R Output: "+rightPID.get(),

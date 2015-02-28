@@ -16,22 +16,18 @@ public class Utils {
 		return s;
 	}
 	
-	public static String pwmOutToString(int indentLevel, String className, int module, int channel) {
-		return indent(indentLevel)+"[" + className + ": on module " + module + ", PWM output " + channel+ "]";
+	public static String pwmOutToString(int indentLevel, String className, int channel) {
+		return indent(indentLevel)+"[" + className + ": on PWM output " + channel+ "]";
 	}
 	
-	public static String encoderToString(int indentLevel,
-			int AModule, int AChannel,
-			int BModule, int BChannel) {
+	public static String encoderToString(int indentLevel, int AChannel, int BChannel) {
 		String indent = indent(indentLevel);
-		String indentPlusOne = indent(indentLevel + 1);
-		return  indent + "[Encoder Channel A on module " + AModule  + ", on Diginal input " + AChannel + "\n" +
-				indent + " Encoder Channel B on module " + BModule  + ", on Diginal input " + BChannel + "]";
+		return  indent + "[Encoder Channel A on Diginal input " + AChannel + "\n" +
+				indent + " Encoder Channel B on Diginal input " + BChannel + "]";
 	}
 	
 	public static String PIDToString(int indentLevel, double Kp, double Ki, double Kd, double Kf) {
 		String indent = indent(indentLevel);
-		String indentPlusOne = indent(indentLevel + 1);
 		
 		String s = indent + "[PIDController: Kp: " + Kp + " Ki: " + Ki + " Kd: " + Kd;
 		if (Kf != 0) s += " Kf: " + Kf;

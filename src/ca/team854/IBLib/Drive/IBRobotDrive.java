@@ -1,9 +1,8 @@
 package ca.team854.IBLib.Drive;
 
-import ca.team854.IBLib.Drive.IBDriveBundle.IBDriveBundleFactory;
 import ca.team854.IBLib.Utils;
+import ca.team854.IBLib.Drive.IBDriveBundle.IBDriveBundleFactory;
 import edu.wpi.first.wpilibj.RobotDrive;
-import java.io.UnsupportedEncodingException;
 
 /**
  *
