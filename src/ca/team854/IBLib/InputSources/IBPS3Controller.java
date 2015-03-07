@@ -12,29 +12,33 @@ package ca.team854.IBLib.InputSources;
  */
 public class IBPS3Controller extends IBGameController {
 
+	public static int LeftThumbstickXAxis = 0;
+	public static int LeftThumbstickYAxis = 1;
+	public static int RightThumbstickXAxis = 2;
+	public static int RightThumbstickYAxis = 3;
+	
+	public static int LeftShoulderButton = 5;
+	public static int RightShoulderButton = 6;
+	public static int LeftTriggerButton = 7;
+	public static int RightTriggerButton = 8;
+	public static int SelectButton = 9;
+	public static int StartButton = 10;
+
+	public static int TriangleButton = 4;
+	public static int CircleButton = 3;
+	public static int SquareButton = 2;
+	public static int XButton = 1;
+	
 	public IBPS3Controller() {
-		 this(1);
+		 this(0);
 	}
 
 	public IBPS3Controller(int port) {
 		super(port);
-		LeftThumbstickXAxis = 1;
-		LeftThumbstickYAxis = 2;
-		RightThumbstickXAxis = 3;
-		RightThumbstickYAxis = 4;
-		DPadXAxis = 5;
-		DPadYAxis = 6;
-		
-		LeftShoulderButton = 5;
-		RightShoulderButton = 6;
-		LeftTriggerButton = 7;
-		RightTriggerButton = 8;
-		SelectButton = 9;
-		StartButton = 10;
 	}
 	
-	public boolean getTriangleButton() { return getRawButton(4); }
-	public boolean getCircleButton() { return getRawButton(3); }
-	public boolean getSquareButton() { return getRawButton(1); }
-	public boolean getXButton() { return getRawButton(2); }
+	public boolean getTriangleButton() { return getRawButton(TriangleButton); }
+	public boolean getCircleButton() { return getRawButton(CircleButton); }
+	public boolean getSquareButton() { return getRawButton(SquareButton); }
+	public boolean getXButton() { return getRawButton(XButton); }
 }

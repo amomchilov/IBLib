@@ -18,8 +18,6 @@ public abstract class IBGameController extends IBJoystick {
 	public static int LeftThumbstickYAxis;
 	public static int RightThumbstickXAxis;
 	public static int RightThumbstickYAxis;
-	public static int DPadXAxis;
-	public static int DPadYAxis;
 	
 	public static int LeftShoulderButton;
 	public static int RightShoulderButton;
@@ -54,8 +52,13 @@ public abstract class IBGameController extends IBJoystick {
 	}
 	
 	public boolean getDPad(IBDirection direction) {
-		return super.getDPad(DPadXAxis, DPadYAxis, direction);
+		return super.getDPad(0, direction);
 	}
+	
+	public boolean getDPad_quadrant(IBDirection direction) {
+		return super.getDPad_quadrant(0, direction);
+	}
+	
 	
 	public boolean getTriggerLeft() { return getRawButton(LeftTriggerButton); }
 	public boolean getTriggerRight() { return getRawButton(RightTriggerButton); }

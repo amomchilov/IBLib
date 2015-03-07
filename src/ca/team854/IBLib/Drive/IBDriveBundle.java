@@ -33,6 +33,7 @@ public class IBDriveBundle {
 				  int encoderAChannel, int encoderBChannel, Encoder e,
 				  PIDController p) {
 		this.motorChannel = motorChannel;
+
 		this.motor = s;
 		this.motorClassName = name;
 		this.smallestAllowedChange = smallestAllowedChange;
@@ -47,12 +48,12 @@ public class IBDriveBundle {
 	}
 	
 	public int getMotorChannel()		{ return motorChannel;		}
-	public SpeedController getMotor()	{ return motor;			}
+	public SpeedController getMotor()	{ return motor;				}
 	public String getMotorClassName()	{ return motorClassName;	}
 	
 	public int getEncoderAChannel() 	{ return encoderAChannel;	}
 	public int getEncoderBChannel() 	{ return encoderBChannel;	}
-	public Encoder getEncoder() 		{ return encoder;		}
+	public Encoder getEncoder() 		{ return encoder;			}
 	
 	public PIDController getPidController() { return pidController;		}
 	
@@ -60,6 +61,8 @@ public class IBDriveBundle {
 		if (Math.abs(speed - previousSpeed) <= smallestAllowedChange) return; //change in speed to small, ignore it
 		if (getPidController() != null) { //if the bundle is PID controlled
 			getPidController().setSetpoint(speed); //set the setpoint on PID
+
+			System.out.println("Set point: " + getPidController().getSetpoint());
 		}
 		else getMotor().set(speed); //otherwise set motor speed directly
 		
@@ -68,6 +71,10 @@ public class IBDriveBundle {
 	
 	public String toString() {
 		return toString(0);
+	}
+	
+	public void get() {
+		//TODO: implement
 	}
 	
 	public String toString(int indentLevel) {
@@ -96,15 +103,21 @@ public class IBDriveBundle {
 		private int encoderAChannel;
 		private int encoderBChannel;
 		private Encoder encoder;
-	
-		private PIDController pidController;
+
+		private double Kp;
+		private double Ki;
+		private double Kd;
+		private double Kf;
+		private double period;
+		private boolean addPID;
 		
 		public IBDriveBundleFactory addMotor(int motorChannel, Class<? extends SpeedController> c) {
 			try {
-				SpeedController m = c.getConstructor(Integer.class).newInstance(motorChannel);
+				//TODO: ensure this works with CAN speed controllers
+				SpeedController m = c.getConstructor(Integer.TYPE).newInstance(motorChannel);
 				return addMotor(motorChannel, m);
 			} catch (Exception e) {
-				// TODO Auto-generated catch block
+				System.err.println("Something went wrong with this fancy reflection stuff. D:");
 				e.printStackTrace();
 			}
 			
@@ -162,23 +175,32 @@ public class IBDriveBundle {
 			return this;
 		}
 		
-		public IBDriveBundleFactory addPIDController(double Kp, double Ki, double Kd) {
-			return addPIDController(Kp, Ki, Kd, 0, PIDController.kDefaultPeriod);
-		}
-		
 		public IBDriveBundleFactory addPIDController(double Kp, double Ki, double Kd, double Kf) {
 			return addPIDController(Kp, Ki, Kd, Kf, PIDController.kDefaultPeriod);
 		}
 		
 		public IBDriveBundleFactory addPIDController(double Kp, double Ki, double Kd, double Kf, double period) {
-			this.pidController = new PIDController(Kp, Ki, Kd, Kf, encoder, motor, period);
+			this.Kp = Kp;
+			this.Ki = Ki;
+			this.Kd = Kd;
+			this.Kf = Kf;
+			this.period = period;
+			addPID = true; //the PIDController object will be instantiated in commit()
+			
 			return this;
 		}
 		
 		public IBDriveBundle commit() {
+			
+			PIDController pid = null;
+			if (addPID) {
+				pid = new PIDController(Kp, Ki, Kd, Kf, encoder, motor, period);
+				pid.enable();
+			}
+			
 			return new IBDriveBundle(motorChannel, motor, motorsClassName, smallestAllowedChange,
 									encoderAChannel, encoderBChannel,
-									encoder, pidController);
+									encoder, pid);
 		}
 		
 		public static IBDriveBundle newBasicBundle(int channel, Class<? extends SpeedController> c) {

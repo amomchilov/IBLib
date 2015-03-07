@@ -10,12 +10,21 @@ package ca.team854.IBLib.InputSources;
  *
  * @author Alexander
  */
-public class IBJoystick extends IBHID {
+public abstract class IBJoystick extends IBHID {
+
+	public static int AXIS_X;
+	public static int AXIS_Y;
+	public static int AXIS_Z;
+	
 	public IBJoystick() {
-		this(1);
+		this(0);
 	}
 	
 	public IBJoystick(int port) {
 		super(port);
 	}
+
+	public double getXAxis() { return super.getAxis(AXIS_X); }	
+	public double getYAxis() { return -super.getAxis(AXIS_Y); }	
+	public double getZAxis() { return super.getAxis(AXIS_Z); }	
 }

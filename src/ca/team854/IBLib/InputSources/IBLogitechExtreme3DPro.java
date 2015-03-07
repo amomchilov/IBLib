@@ -12,23 +12,28 @@ import ca.team854.IBLib.Enums.IBDirection;
  *
  * @author Alexander
  */
-public class IBLogitechExtreme3DPro extends IBHID {
+public class IBLogitechExtreme3DPro extends IBJoystick {
 	
 	public IBLogitechExtreme3DPro() {
-		this(1);
+		this(0);
 	}
 	
 	public IBLogitechExtreme3DPro(int port) {
 		super(port);
+		AXIS_X = 1;
+		AXIS_Y = 2;
+		AXIS_Z = 3;
 	}
 	
 	public boolean getHatSwitch (IBDirection direction) {
-		return super.getDPad(5, 6, direction);
+		return super.getDPad(0, direction);
 	}
 	
+	public boolean getHatSwitch_quadrant(IBDirection direction) {
+		return super.getDPad_quadrant(0, direction);
+	}
+	
+
 	public boolean getThumbButton() { return getRawButton(2); }
-	public double getXAxis() { return super.getAxis(1); }	
-	public double getYAxis() { return -super.getAxis(2); }	
-	public double getZAxis() { return super.getAxis(3); }	
 	public double getThrottle() { return -super.getAxis(4); }
 }
